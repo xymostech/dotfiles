@@ -1,0 +1,20 @@
+[pager]
+pager = LESS='FSRX' less
+
+# Pipe to less the output of the following commands.
+# Can be temporarily disabled with --pager=off
+attend = annotate, cat, diff, export, glog, log, qdiff, slog, dlog, gslog, sglog, df, nlog, outgoing, lg, lga
+
+[ui]
+username = Emily Eisenberg <emily@khanacademy.org>
+
+[extensions]
+pager =
+
+[alias]
+# Takes a revision argument and shows the diff: hg show 1337
+show = log --stat --color=always -vpr
+st = st -S
+
+[diff]
+git = True

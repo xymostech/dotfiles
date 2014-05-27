@@ -1,0 +1,21 @@
+[user]
+    name = Emily Eisenberg
+    email = xymostech@gmail.com
+[alias]
+    st=status -sb
+    graph=log --decorate --graph --oneline --pretty=format:'%C(yellow)%h%Creset -%C(red)%d%Creset %Cgreen(%cr)%Creset %C(blue)<%an>%Creset %C(white)%s%Creset '
+    co = checkout
+    up = "!f() { git submodule update --init --recursive; }; f"
+    weekly = "!sh -c 'git log --author=$(git config user.email) --since=`date -d last\\ monday +%Y/%m/%d`'"
+    p = add --patch
+[color]
+    ui = 1
+[branch]
+    autosetupmerge = always
+[core]
+    editor = /usr/bin/emacs
+    excludesfile = /home/xymostech/.gitignore
+[push]
+    default = simple
+[web]
+    browser = chromium

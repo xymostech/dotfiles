@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+cd /tmp
+
+TEMP=$(mktemp)
+TEMPTEX=$TEMP.tex
+TEMPPDF=$TEMP.pdf
+TEMPCROP=$TEMPPDF.out
+
+echo "\documentclass{article} \usepackage{amsmath} \begin{document} \pagestyle{empty} $" $1 "$ \end{document}" > $TEMPTEX
+
+pdflatex -halt-on-error $TEMPTEX > /dev/null
+
+if [ $? == 0 ]
+then
+    pdfcrop --margins '5 0 5 0' $TEMPPDF $TEMPCROP > /dev/null
+
+    evince $TEMPCROP
+else
+    echo "Error formatting"
+fi
+
+rm $TEMP*

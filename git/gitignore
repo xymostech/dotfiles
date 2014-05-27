@@ -1,0 +1,15 @@
+.ycm_extra_conf.py*
+.bundle/
+vendor/
+todo
+runserver.sh
+push.sh
+dev.sh
+update.sh
+*.pyc
+fakeMathJax.js
+favicon.ico
+Session.vim
+*~
+*#
+.emacs.desktop*
