@@ -2,8 +2,11 @@ source,destination
 hg/hgrc,~/.hgrc
 tmux/tmux.conf,~/.tmux.conf
 bin,~/bin
-ssh,~/.ssh
-fish,~/.config/fish
+ssh/config,~/.ssh/config
+fish/config.fish,~/.config/fish/config.fish
+fish/functions,~/.config/fish/functions
 fish/config.fish,~/.fishrc
 i3/i3config,~/.i3/config
 i3/i3status.conf,~/.i3status.conf
+git/gitconfig,~/.gitconfig
+git/gitignore,~/.gitignore
