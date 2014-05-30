@@ -10,3 +10,5 @@ i3/i3config,~/.i3/config
 i3/i3status.conf,~/.i3status.conf
 git/gitconfig,~/.gitconfig
 git/gitignore,~/.gitignore
+emacs/emacs.el,~/.emacs.el
+emacs/emacs.d,~/.emacs.d
