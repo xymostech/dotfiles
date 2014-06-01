@@ -12,3 +12,4 @@ git/gitconfig,~/.gitconfig
 git/gitignore,~/.gitignore
 emacs/emacs.el,~/.emacs.el
 emacs/emacs.d,~/.emacs.d
+terminator/config,~/.config/terminator/config
