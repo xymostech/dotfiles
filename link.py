@@ -22,6 +22,7 @@ def make_links():
     for (src, dest) in links:
         abssrc = os.path.abspath(src)
         absdest = os.path.expanduser(dest)
+        destdir = os.path.dirname(absdest)
         done = False
         if os.path.lexists(absdest):
             if os.stat(absdest) == os.stat(abssrc):
@@ -37,6 +38,8 @@ def make_links():
                     os.replace(absdest, absdest + ".old")
         if not done:
             print("Linking '{}' to '{}'".format(abssrc, absdest))
+            if not os.path.lexists(destdir):
+                os.makedirs(destdir)
             os.symlink(abssrc, absdest)
 
 parser = argparse.ArgumentParser(description="Manage the configuration files")
