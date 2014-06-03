@@ -13,3 +13,4 @@ git/gitignore,~/.gitignore
 emacs/emacs.el,~/.emacs.el
 emacs/emacs.d,~/.emacs.d
 terminator/config,~/.config/terminator/config
+aria2/aria2.conf,~/.aria2/aria2.conf
