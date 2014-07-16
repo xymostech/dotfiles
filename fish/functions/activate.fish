@@ -4,8 +4,8 @@ function activate -d "Activate virtualenv"
         set new_virtualenv "default"
     else
         switch $argv
-            case 'khan27'
-                set new_virtualenv "khan27"
+            case 'khan'
+                set new_virtualenv "khan-python27"
             case '*'
                 set new_virtualenv "default"
         end

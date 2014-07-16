@@ -2,10 +2,8 @@
 set -x PATH /usr/local/bin /usr/local/sbin /usr/bin
 set -x PATH $PATH ~/khan/devtools/arcanist/khan-bin ~/khan/devtools/elastic-mapreduce-ruby ~/khan/devtools/google_appengine_linux
 set -x PATH $PATH /usr/bin/vendor_perl
-set -x PATH $PATH ~/.gem/ruby/2.0.0/bin
 set -x PATH $PATH ~/bin
 set -x PATH $PATH ~/.tmuxifier/bin
-set -x PATH ~/.cabal/bin $PATH
 
 set -x _OLD_VIRTUAL_PATH $PATH
 
@@ -19,6 +17,9 @@ set -x EDITOR /usr/bin/emacs
 
 # get rid of fish's greeting
 set fish_greeting
+
+# Add tmuxifier completions
+source ~/.tmuxifier/completion/tmuxifier.fish
 
 # an improved ls
 function ls
@@ -42,3 +43,11 @@ end
 
 _virtualenv_handler
 
+# Custom completions
+complete -f -c t -a '(tmuxifier list-sessions)' -d 'Create a tmux session'
+complete -f -c t -a '(tmux list-sessions 2> /dev/null | sed "s/: .*//")' -d 'Load the tmux session'
+
+complete -f -c net -a 'up start' -d 'Start the network'
+complete -f -c net -a 'down stop' -d 'Stop the network'
+complete -f -c net -a 'restart' -d 'Restart the network service'
+complete -f -c net -a 'reset' -d 'Reload all netctl profiles'
