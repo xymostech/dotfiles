@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+SERVER_NAME="$1"
+
+if test -z $SERVER_NAME
+then
+    echo "Usage: $(basename $0) [server-name]"
+    echo "  Starts the specified server"
+    echo "  Note: The main server should be started by systemd"
+    exit 1
+fi
+
+STARTED=$(emacsclient --socket-name="$SERVER_NAME" --eval nil 2> /dev/null)
+
+if test "$STARTED" != "nil"
+then
+    emacs --daemon="$SERVER_NAME" 2> /dev/null
+fi
