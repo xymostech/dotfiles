@@ -7,8 +7,6 @@ set -x PATH $PATH ~/bin
 set -x PATH $PATH ~/.tmuxifier/bin
 set -x PATH ~/.cabal/bin $PATH
 
-set -x TERM xterm-256color
-
 set -x _OLD_VIRTUAL_PATH $PATH
 
 set -x PYTHONPATH $PYTHONPATH ~/khan/devtools/google_appengine_linux
