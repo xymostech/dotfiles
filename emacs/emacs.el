@@ -1,18 +1,19 @@
-; ------- Default Emacs Config --------
+;------- Default Emacs Config --------
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")))
 
-; Add extra plugin paths
+; Add extra plugin paths (this automatically adds everything in ~/.emacs.d/)
 (setq load-path
-      (append (mapcar 'expand-file-name
-                      '(
-                        "~/.emacs.d/evil/"
-                        "~/.emacs.d/nlinum/"
-                        "~/.emacs.d/color-theme/"
-                        "~/.emacs.d/color-theme-molokai/"
-                        ))
-              load-path))
+      (append
+       (delq nil
+             (mapcar (lambda (file)
+                       (and (file-directory-p (concat "~/.emacs.d/" file))
+                            (not (equal file "."))
+                            (not (equal file ".."))
+                            (expand-file-name (concat "~/.emacs.d/" file))))
+                     (directory-files (expand-file-name "~/.emacs.d/"))))
+       load-path))
 
 ; Don't show a startup screen
 (setq inhibit-startup-screen +1)
@@ -68,6 +69,19 @@
 ; Make unique filenames more useful
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'reverse)
+(setq uniquify-after-kill-buffer-p t)
+(setq uniquify-ignore-buffers-re "^\\*")
+
+; Setup ido
+(require 'ido)
+(ido-mode t)
+(ido-everywhere t)
+(setq ido-enable-flex-matching t)
+(setq ido-use-filename-at-point 'guess)
+(setq ido-create-new-buffer 'always)
+
+; Always indent after return. I would try using C-j, but it conflicts with tmux
+(define-key global-map (kbd "RET") 'newline-and-indent)
 
 ; ------- Filetype Specific Settings -------
 
@@ -87,7 +101,13 @@
             (setq tab-width 8)
             (setq indent-tabs-mode t)))
 
+; Add mail-mode for mutt
+(add-to-list 'auto-mode-alist '("/tmp/mutt.*" . mail-mode))
+
 ; ------- Plugin Specifc Settings --------
+
+; Disable some evil features
+(setq evil-want-C-i-jump nil)
 
 ; Enable evil-mode globally
 (require 'evil)
@@ -99,15 +119,27 @@
 (global-nlinum-mode 1)
 
 ; Enable my colorscheme
-(require 'color-theme-molokai)
-(require 'color-theme)
-(eval-after-load "color-theme"
-  '(progn
-     (color-theme-initialize)
-     (color-theme-molokai)))
+(require 'molokai-theme)
+
+(autoload 'rust-mode "rust-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
+
+(autoload 'web-mode "web-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
+
+(add-hook 'web-mode-hook
+          (lambda ()
+            (setq web-mode-css-indent-offset 4)
+            (setq web-mode-code-indent-offset 4)
+            (setq web-mode-style-padding 2)
+            (setq web-mode-script-padding 2)))
 
 ; Setup smart-mode-line
-;(sml/setup)
+(require 'smart-mode-line)
+(add-to-list 'sml/replacer-regexp-list '("^~/repos/dotfiles/" ":.files:") t)
+(setq sml/no-confirm-load-theme t)
+(sml/setup)
 
 ; Enable auctex
 ;(load "auctex.el" nil t t)
@@ -118,10 +150,24 @@
 ;            (add-to-list 'fill-nobreak-predicate 'texmathp)))
 
 ; Enable some whespace settings
-;(global-whitespace-mode 1)
-;(setq whitespace-style '(face trailing spaces-mark tab-mark))
+(global-whitespace-mode 1)
+(setq whitespace-style '(face trailing spaces-mark tab-mark))
+
+; Setup less
+(autoload 'less-css-mode "less-css-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.less\\'" . less-css-mode))
 
 ; -------- Random Extra Functions -------
+
+(defun x-paste ()
+  (interactive)
+  (call-process "xclip" nil t nil "-o"))
+
+(defun x-copy ()
+  (interactive)
+  (call-process-region (region-beginning) (region-end)
+                       "xclip" nil 0 nil "-i" "-selection" "clipboard")
+  (deactivate-mark))
 
 ;(add-hook 'js-mode-hook
 ;  (lambda ()
