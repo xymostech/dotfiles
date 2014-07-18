@@ -16,3 +16,5 @@ terminator/config,~/.config/terminator/config
 aria2/aria2.conf,~/.aria2/aria2.conf
 mutt/muttrc,~/.muttrc
 mutt/mutt,~/.mutt
+tmuxifier/layouts,~/.tmuxifier/layouts
+tmuxifier/templates,~/.tmuxifier/templates
