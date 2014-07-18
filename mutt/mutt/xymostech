@@ -1,0 +1,19 @@
+set my_xymo_user = xymostech@gmail.com
+
+set folder    = imaps://xymostech@imap.gmail.com/
+set imap_user = $my_xymo_user
+set imap_pass = $my_xymo_pass
+set spoolfile = +INBOX
+mailboxes     = +INBOX
+
+set realname  = 'Emily Eisenberg'
+set from      = xymostech@gmail.com
+set use_from  = yes
+
+set smtp_url  = smtps://$my_xymo_user:$my_xymo_pass@smtp.gmail.com
+set ssl_force_tls = yes
+
+account-hook $folder "set imap_user=\$my_xymo_user imap_pass=\$my_xymo_pass"
+
+macro index,pager <Right> '<sync-mailbox><enter-command>source ~/.mutt/khan<enter><change-folder>!<enter>'
+macro index,pager <Left> '<sync-mailbox><enter-command>source ~/.mutt/khan<enter><change-folder>!<enter>'

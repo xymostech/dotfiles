@@ -1,0 +1,44 @@
+set postponed = +[Gmail]/Drafts
+
+set header_cache = ~/.cache/mutt
+set message_cachedir = ~/.cache/mutt
+
+unset imap_passive
+set imap_keepalive = 300
+set mail_check = 60
+set imap_check_subscribed
+
+bind index G imap-fetch-mail
+
+set send_charset = "us-ascii:utf-8"
+
+set sleep_time = 0
+
+source ~/.mutt/xymostech
+folder-hook $folder "source ~/.mutt/xymostech"
+
+source ~/.mutt/khan
+folder-hook $folder "source ~/.mutt/khan"
+
+set alias_file = "~/.mutt/aliases"
+set sort_alias = alias
+source $alias_file
+
+set editor="emacsclient --create-frame --quiet"
+
+set mailcap_path = ~/.mutt/mailcap
+auto_view text/html
+alternative_order text/plain text/html
+
+macro index,pager \cb "<pipe-message>extract_url<enter>" "Get URLs"
+
+source "gpg -dq ~/.mutt/passwords.gpg |"
+
+set sort=threads
+set sort_aux=last-date
+
+unset mark_old
+
+set menu_scroll
+
+set shell /usr/bin/bash

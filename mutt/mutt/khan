@@ -1,0 +1,19 @@
+set my_khan_user = emily@khanacademy.org
+
+set folder    = imaps://emily@khanacademy.org@imap.gmail.com/
+set imap_user = $my_khan_user
+set imap_pass = $my_khan_pass
+set spoolfile = +INBOX
+mailboxes     = +INBOX
+
+set realname  = 'Emily Eisenberg'
+set from      = emily@khanacademy.org
+set use_from  = yes
+
+set smtp_url  = smtps://$my_khan_user:$my_khan_pass@smtp.gmail.com
+set ssl_force_tls = yes
+
+account-hook $folder "set imap_user=\$my_khan_user imap_pass=\$my_khan_pass"
+
+macro index,pager <Right> '<sync-mailbox><enter-command>source ~/.mutt/xymostech<enter><change-folder>!<enter>'
+macro index,pager <Left> '<sync-mailbox><enter-command>source ~/.mutt/xymostech<enter><change-folder>!<enter>'
