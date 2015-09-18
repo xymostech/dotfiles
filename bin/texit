@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+verbose=0
+crop=1
+# Read in arguments
+while test $# -gt 0;
+do
+    key="$1"
+    case $key in
+        -v|--verbose)
+            verbose=1
+            shift
+            ;;
+        --no-crop)
+            crop=0
+            shift
+            ;;
+        *)
+            if test ! $# -eq 1;
+            then
+                echo "Unknown option: '$key'"
+                exit 1
+            else
+                break
+            fi
+            ;;
+    esac
+done
+
+# Create the .tex file
+cd /tmp
+TEMP=$(mktemp)
+
+echo "\nopagenumbers " > $TEMP.tex
+
+if test -z "$1"
+then
+    while read -r line
+    do
+        echo $line >> $TEMP.tex
+    done
+else
+    echo $1 >> $TEMP.tex
+fi
+
+echo " \bye" >> $TEMP.tex
+
+if test $verbose -eq 1
+then
+    cat $TEMP.tex
+    echo
+    pdftex -halt-on-error $TEMP.tex
+else
+    pdftex -halt-on-error $TEMP.tex > /dev/null
+fi
+
+if test $? -eq 0
+then
+    final="$TEMP.pdf"
+    if test $crop -eq 1
+    then
+        pdfcrop --margins '5 1 5 1' $TEMP.pdf $TEMP.pdf.crop > /dev/null
+        final="$TEMP.pdf.crop"
+    fi
+
+    evince "$final" >/dev/null 2>&1
+else
+    echo "Error formatting"
+    if test $verbose -eq 0
+    then
+        echo
+        cat $TEMP.tex
+        echo
+        pdftex -halt-on-error $TEMP.tex
+    fi
+fi
+
+rm $TEMP*

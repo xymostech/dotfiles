@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+rlwrap tex '\relax' '\tracingonline=1'
+cat texput.log
+rm -f texput.log

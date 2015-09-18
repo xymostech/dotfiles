@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+rlwrap latex "\documentclass{article} \usepackage{amsmath} \usepackage{amssymb}"
