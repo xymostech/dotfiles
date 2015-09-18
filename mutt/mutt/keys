@@ -1,0 +1,5 @@
+bind pager u exit
+bind index T tag-thread
+
+macro pager y "<save-message>=[Gmail]/All <enter><enter>" "Archive"
+macro index y "<tag-prefix><save-message>=[Gmail]/All <enter><enter>" "Archive"

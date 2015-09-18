@@ -35,10 +35,14 @@ macro index,pager \cb "<pipe-message>extract_url<enter>" "Get URLs"
 source "gpg -dq ~/.mutt/passwords.gpg |"
 
 set sort=threads
-set sort_aux=last-date
+set sort_aux=reverse-last-date
 
 unset mark_old
 
 set menu_scroll
 
-set shell /usr/bin/bash
+color normal default default
+
+source "~/.mutt/keys"
+
+set shell=/usr/bin/bash
