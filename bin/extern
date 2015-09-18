@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -e
+
+if ! xrandr | grep -q "HDMI1 connected"
+then
+    echo "External display not connected"
+    exit 1
+fi
+
+xrandr --output HDMI1 --auto
+xrandr --output eDP1 --off
