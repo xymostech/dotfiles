@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if [ -z "$1" ]; then
+  PORT="1234"
+else
+  PORT="$1"
+fi
+
+~/.npm/bin/http-server -a "::" -p "$PORT" --cors -c-1
