@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -e
+
+case $1 in
+    start|up)
+        sudo systemctl start netctl-auto@wlp1s0.service
+        ;;
+    stop|down)
+        sudo systemctl stop netctl-auto@wlp1s0.service
+        ;;
+    reset|restart)
+        sudo systemctl restart netctl-auto@wlp1s0.service
+        ;;
+    *)
+        echo "Usage: $0 [start|up|stop|down|reset|restart]"
+        exit 1
+esac
