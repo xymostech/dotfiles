@@ -1,26 +1,18 @@
 # Set a custom session root path. Default is `$HOME`.
 # Must be called before `initialize_session`.
-session_root "~/khan/KaTeX"
+session_root "~/Dropbox/Projects/bsg-rules"
 
-/home/xymostech/bin/ed khan ~/khan/
-export EMACS_SERVER_NAME=khan
+/home/xymostech/bin/ed bsg ~/Dropbox/Projects/bsg-rules
+export EMACS_SERVER_NAME=bsg
 
 # Create session with specified name if it does not already exist. If no
 # argument is given, session name will be based on layout file name.
-if initialize_session "katex"; then
-
-  load_window "emacs"
-
+if initialize_session "bsg"; then
+  new_window "emacs"
   new_window "shell"
-
-  new_window "serve"
-  run_cmd "make serve"
-
-  new_window "remote"
 
   select_window 2
   select_window 1
-
 fi
 
 # Finalize session creation and switch/attach to it.
