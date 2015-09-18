@@ -1,5 +1,5 @@
 [global_config]
-  enabled_plugins = TerminalShot, LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
+  enabled_plugh/ns = TerminalShot, LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
   inactive_color_offset = 0.93
 [keybindings]
   cycle_prev = None
@@ -28,24 +28,27 @@
   go_left = None
   hide_window = None
   reset = None
-  search = <Primary><Shift>f
+  search = None
   go_up = None
   resize_up = None
   rotate_cw = None
   split_horiz = None
+  zoom_normal = None
   go_down = None
   new_window = None
   move_tab_left = None
 [profiles]
   [[default]]
+    scrollbar_position = hidden
     use_system_font = False
-    custom_command = /usr/bin/fish
+    custom_command = /usr/bin/bash
     background_image = None
+    cursor_color = "#bbbbbb"
     foreground_color = "#ffffff"
     use_custom_command = True
     scroll_on_output = False
     show_titlebar = False
-    font = Inconsolata-dz Medium 10
+    font = Inconsolata-dz Medium 9
     background_color = "#090909"
     scrollback_infinite = True
 [layouts]
@@ -53,6 +56,7 @@
     [[[child1]]]
       type = Terminal
       parent = window0
+      profile = default
     [[[window0]]]
       type = Window
       parent = ""
