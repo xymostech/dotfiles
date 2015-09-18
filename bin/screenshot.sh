@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 
-sleep 0.5
+set -e
 
-name=$(mktemp --suffix ".png" "scrot-XXXXXX")
+sleep 0.4
 
-if scrot -s "$name" -e 'mv $f /tmp/' > /dev/null 2>&1;
-then
-    /home/xymostech/bin/clip_image "/tmp/$name"
+tmpfile=$(mktemp --suffix ".png" "/tmp/maim-XXXXXX")
+datefile=/home/xymostech/screenshots/screen_$(date +"%y-%m-%d_%H:%M:%S").png
+
+if maim -s --hidecursor "$tmpfile"; then
+    cp "$tmpfile" "$datefile"
+    /home/xymostech/bin/clip_image "$tmpfile"
+    rm "$tmpfile"
 else
-    rm $name
+    rm "$tmpfile"
 fi
