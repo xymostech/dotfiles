@@ -1,21 +1,15 @@
 
 function activate -d "Activate virtualenv"
     if [ (count $argv) -eq 0 ]
-        set new_virtualenv "default"
+        set new_virtualenv "khan-python27"
     else
-        switch $argv
-            case 'khan'
-                set new_virtualenv "khan-python27"
-            case '*'
-                set new_virtualenv "default"
-        end
+        set new_virtualenv $argv
     end
 
     if [ $_virtualenv = $new_virtualenv ]
         return
     end
 
-    # Setup the khan virtualenv
     if functions -q deactivate
         deactivate
     end
@@ -23,5 +17,5 @@ function activate -d "Activate virtualenv"
     set -g _virtualenv $new_virtualenv
 
     . ~/.virtualenv/$_virtualenv/bin/activate.fish
-    test 0
+    true
 end
