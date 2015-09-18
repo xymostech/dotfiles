@@ -4,16 +4,17 @@
 [alias]
     st=status -sb
     graph=log --decorate --graph --oneline --pretty=format:'%C(yellow)%h%Creset -%C(red)%d%Creset %Cgreen(%cr)%Creset %C(blue)<%an>%Creset %C(white)%s%Creset '
-    co = checkout
+    co=checkout
+    coall = "!f() { git checkout \"$@\" && git submodule update --init --recursive; }; f"
     up = "!f() { git submodule update --init --recursive; }; f"
     weekly = "!sh -c 'git log --author=$(git config user.email) --since=`date -d last\\ monday +%Y/%m/%d`'"
-    p = add --patch
+    p = "!f() { git pull \"$@\" && git submodule update --init --recursive; }; f"
 [color]
     ui = 1
 [branch]
     autosetupmerge = always
 [core]
-    editor = /usr/bin/emacs
+    editor = /home/xymostech/bin/e
     excludesfile = /home/xymostech/.gitignore
 [push]
     default = simple
