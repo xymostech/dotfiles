@@ -1,20 +1,4 @@
-;------- Default Emacs Config --------
-(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")
-                         ("melpa" . "http://melpa.milkbox.net/packages/")))
-
-; Add extra plugin paths (this automatically adds everything in ~/.emacs.d/)
-(setq load-path
-      (append
-       (delq nil
-             (mapcar (lambda (file)
-                       (and (file-directory-p (concat "~/.emacs.d/" file))
-                            (not (equal file "."))
-                            (not (equal file ".."))
-                            (expand-file-name (concat "~/.emacs.d/" file))))
-                     (directory-files (expand-file-name "~/.emacs.d/"))))
-       load-path))
-
+; ------- Default Emacs Config --------
 ; Don't show a startup screen
 (setq inhibit-startup-screen +1)
 
@@ -43,8 +27,13 @@
 (setq auto-save-file-name-transforms
       '((".*" "~/.tmp" t)))
 
+; Save the place I last visited files
+(require 'saveplace)
+(setq-default save-place t)
+(setq save-place-file "~/.emacs.d/save-places")
+
 ; Set the default line wrap
-(setq-default fill-column 80)
+(setq-default fill-column 79)
 
 ; Use the x clipboard
 (setq x-select-enable-primary nil)
@@ -77,41 +66,114 @@
 (ido-mode t)
 (ido-everywhere t)
 (setq ido-enable-flex-matching t)
-(setq ido-use-filename-at-point 'guess)
+(setq ido-use-filename-at-point nil)
 (setq ido-create-new-buffer 'always)
 
 ; Always indent after return. I would try using C-j, but it conflicts with tmux
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
+; Turn on column numbering
+(setq column-number-mode t)
+
+; ------- Package setup --------
+; Setup the list of package sources
+(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                         ("melpa" . "http://melpa.org/packages/")))
+
+; The list of packages I install through package.el
+(defvar managed-packages
+  '(magit haskell-mode js2-mode nlinum less-css-mode
+          color-theme rust-mode smart-mode-line lua-mode
+          markdown-mode glsl-mode))
+
+; The list of packages I manually manage
+(defvar manual-packages
+  '(web-mode editor-config molokai-theme color-theme-molokai))
+
+; Setup package.el
+(require 'package)
+(package-initialize)
+
+; Ensure all of the packages
+;(package-refresh-contents)
+;(dolist (package managed-packages)
+  ;(when (not (package-installed-p package))
+    ;(package-install package)))
+
+; Add manual plugin paths (this automatically adds everything in ~/.emacs.d/manual/)
+(setq load-path
+      (append
+       (delq nil
+             (mapcar (lambda (file)
+                       (and (file-directory-p (concat "~/.emacs.d/manual/" file))
+                            (not (equal file "."))
+                            (not (equal file ".."))
+                            (expand-file-name (concat "~/.emacs.d/manual/" file))))
+                     (directory-files (expand-file-name "~/.emacs.d/manual/"))))
+       load-path))
+
 ; ------- Filetype Specific Settings -------
 
-;(require 'cmake-mode)
-;(setq auto-mode-alist
-;      (append auto-mode-alist
-;              '(
-;                ("\\.jsx\\'" . javascript-mode)
-;                ("CMakeLists\\.txt\\'" . cmake-mode)
-;                ("\\.cmake\\'" . cmake-mode)
-;               )))
+(defvar mode-autoloads
+  '(
+    ('markdown-mode . "markdown-mode")
+    )
+  )
+
+(mapcar
+ (lambda (data)
+          (autoload (car data) (cdr data) nil t))
+ '(
+   (markdown-mode . "markdown-mode")
+   (js2-mode . "js2-mode")
+   (web-mode . "web-mode")
+  ))
+
+(setq auto-mode-alist
+      (append auto-mode-alist
+              '(
+                ("\\.jsx\\'" . web-mode)
+                ("\\.cmake\\'" . cmake-mode)
+               )))
 
 ; change some indenting settings in C++
-(add-hook 'c++mode-hook
-          (lambda ()
-            (setq c-basic-offset 8)
-            (setq tab-width 8)
-            (setq indent-tabs-mode t)))
+;(add-hook 'c++mode-hook
+;          (lambda ()
+;            (setq c-basic-offset 8)
+;            (setq tab-width 8)
+;            (setq indent-tabs-mode t)))
 
 ; Add mail-mode for mutt
-(add-to-list 'auto-mode-alist '("/tmp/mutt.*" . mail-mode))
+;(add-to-list 'auto-mode-alist '("/tmp/mutt.*" . mail-mode))
+
+;(autoload 'elm-mode "elm-mode" nil t)
+;(add-to-list 'auto-mode-alist '("\\.elm\\'" . elm-mode))
+
+;(setenv "PATH" (concat (getenv "PATH") ":~/.elm/bin"))
+;(add-to-list 'exec-path "~/.elm/bin")
+
+;(autoload 'markdown-mode "markdown-mode" nil t)
+;(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+
+;(require 'lua-mode)
+;(setq lua-indent-level 2)
+
+;(autoload 'glsl-mode "glsl-mode" nil t)
+;(add-to-list 'auto-mode-alist '("\\.glsl\\'" . glsl-mode))
 
 ; ------- Plugin Specifc Settings --------
 
 ; Disable some evil features
-(setq evil-want-C-i-jump nil)
+;(setq evil-want-C-i-jump nil)
 
 ; Enable evil-mode globally
-(require 'evil)
-(evil-mode 1)
+;(require 'evil)
+;(evil-mode 1)
+
+; Some modes need emacs mode
+;(evil-set-initial-state 'git-rebase-mode 'emacs)
 
 ; Setup nlinum
 (require 'nlinum)
@@ -121,19 +183,26 @@
 ; Enable my colorscheme
 (require 'molokai-theme)
 
-(autoload 'rust-mode "rust-mode" nil t)
-(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
+;(autoload 'rust-mode "rust-mode" nil t)
+;(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 
-(autoload 'web-mode "web-mode" nil t)
-(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
+;(autoload 'web-mode "web-mode" nil t)
+;(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+;(add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
 
-(add-hook 'web-mode-hook
-          (lambda ()
-            (setq web-mode-css-indent-offset 4)
-            (setq web-mode-code-indent-offset 4)
-            (setq web-mode-style-padding 2)
-            (setq web-mode-script-padding 2)))
+;(add-to-list 'auto-mode-alist '("\\.jsx$" . web-mode))
+;(defadvice web-mode-highlight-part (around tweak-jsx activate)
+;    (if (equal web-mode-content-type "jsx")
+;              (let ((web-mode-enable-part-face nil))
+;                        ad-do-it)
+;          ad-do-it))
+
+;(add-hook 'web-mode-hook
+;          (lambda ()
+;            (setq web-mode-css-indent-offset 4)
+;            (setq web-mode-code-indent-offset 4)
+;            (setq web-mode-style-padding 2)
+;            (setq web-mode-script-padding 2)))
 
 ; Setup smart-mode-line
 (require 'smart-mode-line)
@@ -154,14 +223,19 @@
 (setq whitespace-style '(face trailing spaces-mark tab-mark))
 
 ; Setup less
-(autoload 'less-css-mode "less-css-mode" nil t)
-(add-to-list 'auto-mode-alist '("\\.less\\'" . less-css-mode))
+;(autoload 'less-css-mode "less-css-mode" nil t)
+;(add-to-list 'auto-mode-alist '("\\.less\\'" . less-css-mode))
+
+; Setup editor config
+;(load "editorconfig")
+
+(require 'magit)
 
 ; -------- Random Extra Functions -------
 
 (defun x-paste ()
   (interactive)
-  (call-process "xclip" nil t nil "-o"))
+  (call-process "xclip" nil t nil "-o" "-selection" "clipboard"))
 
 (defun x-copy ()
   (interactive)
