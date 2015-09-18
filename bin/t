@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -e
+
+session="$1"
+
+if [ "$session" == "" ]; then
+    echo "Usage: $(basename $0) <session-name> <extra-args...>"
+fi
+
+shift
+
+if tmux -q has-session -t "$session" 2>/dev/null; then
+    tmux -2 attach-session -d -t "$session" "$@"
+elif tmuxifier ls | egrep -q "^$session\$"; then
+    tmuxifier s "$session" "$@"
+else
+    tmux -2 new-session -s "$session" "$@"
+fi
