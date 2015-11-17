@@ -41,7 +41,7 @@
   [[default]]
     scrollbar_position = hidden
     use_system_font = False
-    custom_command = /usr/bin/bash
+    custom_command = /usr/bin/zsh
     background_image = None
     cursor_color = "#bbbbbb"
     foreground_color = "#ffffff"

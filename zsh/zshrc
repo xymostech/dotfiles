@@ -1,0 +1,65 @@
+# Setup my path
+PATH=/usr/local/bin:/usr/local/sbin:/usr/bin
+PATH=$HOME/bin:$PATH
+PATH=$PATH:/usr/bin/vendor_perl
+PATH=$PATH:$HOME/.tmuxifier/bin
+PATH=$PATH:$HOME/.gem/ruby/2.1.0/bin
+PATH=$PATH:$HOME/khan/devtools/arcanist/khan-bin:$HOME/khan/devtools/git-bigfile/bin:$HOME/khan/devtools/khan-linter/bin
+export PATH=$PATH
+
+export VIRTUAL_ENV_DISABLE_PROMPT="y"
+
+if test $TERM = "xterm"; then
+    export TERM="xterm-256color"
+fi
+
+export EDITOR="$HOME/bin/e"
+
+# Use nvm
+export NVM_DIR="$HOME/.nvm"
+source /usr/share/nvm/nvm.sh
+
+# Add my PROMPT
+source ~/.zsh/prompt.zsh
+
+# Aliases
+alias ls='ls -AFs1kG --color=auto'
+alias tmux='tmux -2'
+alias xclip='xclip -selection clipboard'
+
+# Make the time format more standard
+export TIMEFMT=$'\nreal\t%E\nuser\t%U\nsys\t%S'
+
+# Remove some things from wordchars to make option-delete work better
+WORDCHARS="*?_-.[]~=&;!#$%^(){}<>"
+
+# Setup antigen
+source ~/.zsh/antigen.zsh
+antigen bundle zsh-users/zsh-syntax-highlighting
+
+# Allow #s on lines
+setopt interactivecomments
+
+# history options
+HISTSIZE=1000
+SAVEHIST=1000
+HISTFILE=~/.history
+setopt INC_APPEND_HISTORY
+setopt EXTENDED_HISTORY
+
+# Activate a given virtualenv, defaulting to khan
+function activate() {
+    local virtualenv
+    if test $# = 0; then
+        virtualenv="khan-python27"
+    else
+        virtualenv=$1
+    fi
+
+    if declare -f deactivate > /dev/null; then
+        deactivate
+    fi
+
+    source "$HOME/.virtualenv/$virtualenv/bin/activate"
+}
+activate
