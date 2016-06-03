@@ -5,8 +5,13 @@
 ; Fish breaks some plugins
 (setq shell-file-name "/usr/bin/bash")
 
-; Disable the top menu bar
+; Never make annoying sounds
+(setq ring-bell-function 'ignore)
+
+; Disable some UI features
 (menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
 
 ; Set some default tab settings
 (setq-default c-basic-offset 4      ; indent amount
@@ -68,8 +73,8 @@
 ;(setq uniquify-ignore-buffers-re "^\\*")
 
 ; Setup ido
-(require 'ido)
-(ido-mode t)
+;(require 'ido)
+;(ido-mode t)
 ;(ido-everywhere t)
 ;(setq ido-enable-flex-matching t)
 ;(setq ido-use-filename-at-point nil)
@@ -86,32 +91,42 @@
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.org/packages/")))
 
+;; Marmalade doesn't seem to work: https://github.com/nicferrier/elmarmalade/issues/55
+;; ("marmalade" . "https://marmalade-repo.org/packages/")
+
 ; The list of packages I install through package.el
 (defvar managed-packages
-  '(magit haskell-mode
-          ;js2-mode
-          less-css-mode
-          color-theme
-          ;rust-mode
-          smart-mode-line
-          ;lua-mode
-          markdown-mode
-          ;glsl-mode
-          ))
+  '(magit
+    haskell-mode
+    ;;js2-mode
+    less-css-mode
+    color-theme
+    ;;rust-mode
+    smart-mode-line
+    ;;lua-mode
+    markdown-mode
+    projectile
+    helm-projectile
+    ;;glsl-mode
+    ))
 
 ; The list of packages I manually manage
 (defvar manual-packages
-  '(web-mode editor-config molokai-theme color-theme-molokai))
+  '(web-mode
+    editor-config
+    json-mode
+    helm
+    ))
 
 ; Setup package.el
 (require 'package)
 (package-initialize)
 
 ; Ensure all of the packages are loaded
-;(package-refresh-contents)
-;(dolist (package managed-packages)
-  ;(when (not (package-installed-p package))
-    ;(package-install package)))
+(package-refresh-contents)
+(dolist (package managed-packages)
+  (when (not (package-installed-p package))
+    (package-install package)))
 
 ; Add manual plugin paths (this automatically adds everything in ~/.emacs.d/manual/)
 (setq load-path
@@ -134,13 +149,20 @@
    (markdown-mode . "markdown-mode")
    (js2-mode . "js2-mode")
    (web-mode . "web-mode")
-  ))
+   (json-mode . "json-mode")
+   ))
 
-; (setq auto-mode-alist
-;       (append auto-mode-alist
-;               '(
-;                 ("\\.jsx\\'" . web-mode)
-;                )))
+(setq auto-mode-alist
+      (append auto-mode-alist
+              '(
+                ("\\.jsx$" . web-mode)
+                ("\\.json$" . json-mode)
+               )))
+
+(add-hook 'json-mode-hook
+          (lambda ()
+            (make-local-variable 'js-indent-level)
+            (setq js-indent-level 2)))
 
 ; change some indenting settings in C++
 ;(add-hook 'c++mode-hook
@@ -181,6 +203,24 @@
 (setq linum-format 'linum-format-func)
 (global-linum-mode 1)
 
+(defun helm-maybe-projectile-find-files (arg)
+  (interactive "P")
+  (if (projectile-project-p)
+      (helm-projectile-find-file arg)
+    (helm-find-files arg)))
+
+(require 'helm-config)
+(helm-mode 1)
+(global-set-key (kbd "C-x C-f") 'helm-maybe-projectile-find-files)
+(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to do persistent action
+(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
+(define-key helm-map (kbd "C-z") 'helm-select-action) ; list actions using C-z
+
+(projectile-global-mode)
+(setq projectile-enable-caching t)
+(require 'helm-projectile)
+(helm-projectile-on)
+
 ;(autoload 'rust-mode "rust-mode" nil t)
 ;(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 
@@ -188,7 +228,10 @@
 ;(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
 ;(add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
 
-;(add-to-list 'auto-mode-alist '("\\.jsx$" . web-mode))
+(setq web-mode-content-types-alist
+  '(("jsx" . "\\.js[x]?\\'")))
+(setq web-mode-enable-auto-quoting nil)
+
 ;(defadvice web-mode-highlight-part (around tweak-jsx activate)
 ;    (if (equal web-mode-content-type "jsx")
 ;              (let ((web-mode-enable-part-face nil))
@@ -279,16 +322,17 @@
 ;   :initial-value "black"))
 
 (custom-set-faces
- '(default ((t (:background "color-232" :foreground "color-253"))))
- '(font-lock-builtin-face ((t (:foreground "brightyellow"))))
- '(font-lock-comment-face ((t (:foreground "color-241"))))
- '(font-lock-constant-face ((t (:foreground "brightmagenta"))))
- '(font-lock-negation-char-face ((t (:foreground "brightmagenta"))))
- '(font-lock-function-name-face ((t (:foreground "brightgreen"))))
- '(font-lock-keyword-face ((t (:foreground "brightred"))))
- '(font-lock-string-face ((t (:foreground "cyan"))))
- '(font-lock-type-face ((t (:foreground "brightcyan"))))
- '(font-lock-variable-name-face ((t (:foreground "brightgreen"))))
- '(region ((t (:background "#5F005F"))))
- '(hl-line ((t (:background "color-235"))))
- )
+ '(default ((t (:background "#080808" :foreground "#dadada"))))
+ '(font-lock-builtin-face ((t (:foreground "yellow"))))
+ '(font-lock-comment-face ((t (:foreground "#888"))))
+ '(font-lock-constant-face ((t (:foreground "light slate blue"))))
+ '(font-lock-negation-char-face ((t (:foreground "salmon"))))
+ '(font-lock-function-name-face ((t (:foreground "chartreuse"))))
+ '(font-lock-keyword-face ((t (:foreground "orange red"))))
+ '(font-lock-string-face ((t (:foreground "deep sky blue"))))
+ '(font-lock-type-face ((t (:foreground "deep pink"))))
+ '(font-lock-variable-name-face ((t (:foreground "lawn green"))))
+ '(region ((t (:background "midnight blue"))))
+ '(hl-line ((t (:background "#444"))))
+)
+

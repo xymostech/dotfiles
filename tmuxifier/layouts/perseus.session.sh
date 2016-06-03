@@ -1,6 +1,6 @@
 # Set a custom session root path. Default is `$HOME`.
 # Must be called before `initialize_session`.
-session_root "~/khan/perseus/"
+session_root "~/khan/webapp/third_party/javascript-khansrc/perseus"
 
 /home/xymostech/bin/ed khan ~/khan/
 export EMACS_SERVER_NAME=khan

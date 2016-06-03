@@ -1,0 +1,9 @@
+[submodule "emacs/emacs.d/manual/helm"]
+	path = emacs/emacs.d/manual/helm
+	url = https://github.com/emacs-helm/helm.git
+[submodule "emacs/emacs.d/manual/async"]
+	path = emacs/emacs.d/manual/async
+	url = https://github.com/jwiegley/emacs-async.git
+[submodule "emacs/emacs.d/manual/json-mode"]
+	path = emacs/emacs.d/manual/json-mode
+	url = https://github.com/joshwnj/json-mode.git

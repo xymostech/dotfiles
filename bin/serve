@@ -6,4 +6,4 @@ else
   PORT="$1"
 fi
 
-~/.npm/bin/http-server -a "::" -p "$PORT" --cors -c-1
+http-server -a "::" -p "$PORT" --cors -c-1

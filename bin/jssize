@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+echo $1
+echo "Original $(cat $1 | wc -c)"
+echo "Mangled $(cat $1 | uglifyjs --mangle | wc -c)"
+echo "Gzipped $(cat $1 | gzip - | wc -c)"
+echo "Mangled+gzipped $(cat $1 | uglifyjs --mangle | gzip - | wc -c)"

@@ -2,15 +2,17 @@
 
 set -e
 
+device=wlp2s0
+
 case $1 in
     start|up)
-        sudo systemctl start netctl-auto@wlp1s0.service
+        sudo systemctl start netctl-auto@$device.service
         ;;
     stop|down)
-        sudo systemctl stop netctl-auto@wlp1s0.service
+        sudo systemctl stop netctl-auto@$device.service
         ;;
     reset|restart)
-        sudo systemctl restart netctl-auto@wlp1s0.service
+        sudo systemctl restart netctl-auto@$device.service
         ;;
     *)
         echo "Usage: $0 [start|up|stop|down|reset|restart]"

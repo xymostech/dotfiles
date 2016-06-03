@@ -1,6 +1,6 @@
 # Set a custom session root path. Default is `$HOME`.
 # Must be called before `initialize_session`.
-session_root "~/khan/"
+session_root "~/khan/webapp"
 
 /home/xymostech/bin/ed khan ~/khan/
 export EMACS_SERVER_NAME=khan
@@ -10,9 +10,10 @@ export EMACS_SERVER_NAME=khan
 if initialize_session "khan"; then
   new_window "emacs"
   new_window "shell"
-  new_window "shell2"
-  new_window "remote"
-  run_cmd "ssh KADev"
+  new_window "devshell"
+  new_window "serve"
+  new_window "kake logs"
+  run_cmd "tail -f genfiles/kake-server.log"
 
   select_window 2
   select_window 1

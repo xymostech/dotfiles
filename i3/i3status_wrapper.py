@@ -26,6 +26,7 @@
 
 import sys
 import json
+import datetime
 
 def get_memory_usage():
     with open('/proc/meminfo') as fp:
@@ -37,6 +38,14 @@ def get_memory_usage():
                 avail = int(parts[1])
 
     return 1.0 - float(avail) / total
+
+countdown_time = datetime.datetime(2016, 1, 30, 14, 20, 0)
+
+def get_countdown_time():
+    now = datetime.datetime.now()
+    diff = countdown_time - now
+
+    return "%d:%02d:%02d" % (diff.days, diff.seconds / 3600, (diff.seconds % 3600) / 60)
 
 def print_line(message):
     """ Non-buffered printing to stdout. """
@@ -83,6 +92,12 @@ if __name__ == '__main__':
             'name': 'mem',
             'color': color
         })
+
+        # j.insert(0, {
+        #     'full_text': "Madeline in %s" % get_countdown_time(),
+        #     'name': 'countdown',
+        #     'color': "#ffffff"
+        # })
 
         # and echo back new encoded json
         print_line(prefix+json.dumps(j))
