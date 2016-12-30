@@ -18,3 +18,4 @@ mutt/muttrc,~/.muttrc
 mutt/mutt,~/.mutt
 tmuxifier/layouts,~/.tmuxifier/layouts
 tmuxifier/templates,~/.tmuxifier/templates
+Xmodmap,~/.Xmodmap
