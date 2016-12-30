@@ -2,7 +2,7 @@
 
 if test -z $EMACS_SERVER_NAME
 then
-    emacsclient --create-frame --quiet $@
+    emacsclient --create-frame -nw --quiet $@
 else
-    emacsclient --create-frame --quiet --socket-name="$EMACS_SERVER_NAME" $@
+    emacsclient --create-frame -nw --quiet --socket-name="$EMACS_SERVER_NAME" $@
 fi

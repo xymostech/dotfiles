@@ -4,6 +4,7 @@ PATH=$HOME/bin:$PATH
 PATH=$PATH:/usr/bin/vendor_perl
 PATH=$PATH:$HOME/.tmuxifier/bin
 PATH=$PATH:$HOME/.gem/ruby/2.1.0/bin
+PATH=$PATH:/opt/android-sdk/platform-tools
 PATH=$PATH:$HOME/khan/devtools/arcanist/khan-bin:$HOME/khan/devtools/git-bigfile/bin:$HOME/khan/devtools/khan-linter/bin
 export PATH=$PATH
 

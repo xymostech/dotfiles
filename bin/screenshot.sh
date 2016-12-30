@@ -14,3 +14,6 @@ if maim -s --hidecursor "$tmpfile"; then
 else
     rm "$tmpfile"
 fi
+
+# Maybe useful at some point
+# arc upload <file> --json | jq '.[].uri' | grep -o -e '[^/]\+$'

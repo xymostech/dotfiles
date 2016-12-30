@@ -150,6 +150,7 @@
    (js2-mode . "js2-mode")
    (web-mode . "web-mode")
    (json-mode . "json-mode")
+   ; (typescript-mode . "typescript")
    ))
 
 (setq auto-mode-alist
@@ -157,6 +158,7 @@
               '(
                 ("\\.jsx$" . web-mode)
                 ("\\.json$" . json-mode)
+                ; ("\\.ts$" . typescript-mode)
                )))
 
 (add-hook 'json-mode-hook
