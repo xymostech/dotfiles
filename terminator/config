@@ -58,13 +58,12 @@
 [profiles]
   [[default]]
     background_color = "#090909"
-    background_image = None
+    background_type = transparent
     cursor_color = "#bbbbbb"
     custom_command = /usr/bin/zsh
     font = Inconsolata-dz Medium 10
     foreground_color = "#ffffff"
     login_shell = True
-    scroll_on_output = False
     scrollback_infinite = True
     scrollbar_position = hidden
     show_titlebar = False

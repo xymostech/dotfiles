@@ -7,3 +7,9 @@
 [submodule "emacs/emacs.d/manual/json-mode"]
 	path = emacs/emacs.d/manual/json-mode
 	url = https://github.com/joshwnj/json-mode.git
+[submodule "emacs/emacs.d/manual/rust-mode"]
+	path = emacs/emacs.d/manual/rust-mode
+	url = https://github.com/rust-lang/rust-mode
+[submodule "emacs/emacs.d/manual/rjsx-mode"]
+	path = emacs/emacs.d/manual/rjsx-mode
+	url = https://github.com/cjfuller/rjsx-mode.git

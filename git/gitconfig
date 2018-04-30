@@ -1,6 +1,7 @@
 [user]
     name = Emily Eisenberg
     email = xymostech@gmail.com
+    signingkey = 9A364DA3D08D1627
 [alias]
     st=status -sb
     graph=log --decorate --graph --oneline --pretty=format:'%C(yellow)%h%Creset -%C(red)%d%Creset %Cgreen(%cr)%Creset %C(blue)<%an>%Creset %C(white)%s%Creset '
@@ -15,6 +16,8 @@
     next-deploy = "!f() { git tag | grep '^gae-' | grep -v bad | grep -A 1 gae-\"$1\" | tail -n 1 | sed 's/gae-//'; }; f"
     when-deploy = "!f() { git cat-file -p gae-\"$1\" | perl -nle 'print scalar localtime $1 if /^tagger .* (\\d+) \\S+$/'; }; f"
 
+    since-last-build = "!f() { git log --oneline --pretty=format:%h%x20%x20%an%x20%ad%x20%s --date=short HEAD...$(git log --pretty=format:%H -n 1 build); }; f"
+
     recommit = "!git commit -F \"`git rev-parse --git-dir`\"/commit.save"
     cane = commit --amend --no-edit
 [commit]
@@ -23,6 +26,8 @@
     ui = 1
 [branch]
     autosetupmerge = always
+[merge]
+    conflictstyle = diff3
 [core]
     editor = /home/xymostech/bin/e
     excludesfile = /home/xymostech/.gitignore

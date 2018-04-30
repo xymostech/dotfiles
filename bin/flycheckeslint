@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+~/khan/devtools/khan-linter/node_modules/.bin/eslint --no-eslintrc --config ~/khan/devtools/khan-linter/eslintrc $@

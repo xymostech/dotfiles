@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+day=86400 # one day of seconds
+now=$(date '+%s')
+lastweek=$(echo "($now / $day * $day) - ($day * 7)" | bc)
+
+echo '{
+  "constraints": {
+    "authorPHIDs": [
+      "PHID-USER-5stcxfxnly2iwumbnrj4"
+    ]
+  }
+}' | arc call-conduit differential.revision.search | jq -r ".response.data[] | select(.fields.dateCreated>$lastweek) | \" - \" + .fields.title, (.id | tostring | \"([D\" + . + \"](https://phabricator.khanacademy.org/D\" + . + \"))\")" | sed '$!N;s/\n/ /' | tac

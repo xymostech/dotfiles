@@ -107,6 +107,7 @@
     markdown-mode
     projectile
     helm-projectile
+    ;;prettier-js
     ;;glsl-mode
     ))
 
@@ -140,6 +141,8 @@
                      (directory-files (expand-file-name "~/.emacs.d/manual/"))))
        load-path))
 
+(add-to-list 'load-path "~/projects/babylon-mode/")
+
 ; ------- Filetype Specific Settings -------
 
 (mapcar
@@ -149,17 +152,24 @@
    (markdown-mode . "markdown-mode")
    (js2-mode . "js2-mode")
    (web-mode . "web-mode")
+   ; (rjsx-mode . "rjsx-mode")
    (json-mode . "json-mode")
+   (rust-mode . "rust-mode")
+   (babylon-mode . "babylon-mode")
+   (lyqi-mode . "lyqi")
    ; (typescript-mode . "typescript")
    ))
 
 (setq auto-mode-alist
-      (append auto-mode-alist
-              '(
-                ("\\.jsx$" . web-mode)
+      (append '(
+                ("\\.jsx\\'" . babylon-mode)
+                ("\\.js\\'" . babylon-mode)
                 ("\\.json$" . json-mode)
+                ("\\.rs$" . rust-mode)
+                ("\\.ly$" . lyqi-mode)
                 ; ("\\.ts$" . typescript-mode)
-               )))
+               )
+              auto-mode-alist))
 
 (add-hook 'json-mode-hook
           (lambda ()
@@ -223,6 +233,22 @@
 (require 'helm-projectile)
 (helm-projectile-on)
 
+(setq js2-strict-trailing-comma-warning nil)
+(setq js2-mode-show-parse-errors nil)
+(setq js2-mode-show-strict-warnings nil)
+
+(require 'flycheck-flow)
+(add-hook 'js2-mode-hook 'flycheck-mode)
+; (add-hook 'rjsx-mode-hook 'flycheck-mode)
+(flycheck-add-next-checker 'javascript-flow 'javascript-eslint)
+(setq flycheck-idle-change-delay 1.0)
+(setq flycheck-javascript-eslint-executable "/home/xymostech/bin/flycheckeslint")
+
+(add-to-list 'compilation-error-regexp-alist 'flow)
+(setf (alist-get 'flow compilation-error-regexp-alist)
+      '("^\\(.*?[^/\n]\\):[ \t]*\\([1-9][0-9]*\\)[ \t]*$"
+        1 2))
+
 ;(autoload 'rust-mode "rust-mode" nil t)
 ;(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 
@@ -252,15 +278,20 @@
 (setq
  sml/replacer-regexp-list
  '(
-   ("^~/repos/dotfiles/" ":dotfiles:")
-   ("^~/khan/webapp/" ":webapp:")
-   ("^~/Dropbox/Projects/" ":projects:")
+   ("^~/repos/dotfiles/" ":dotfiles:/")
+   ("^~/khan/webapp/third_party/javascript-khansrc/perseus" ":perseus:/")
+   ("^~/khan/webapp/" ":webapp:/")
+   ("^~/projects/" ":projects:/")
    )
  )
 (setq sml/theme 'dark)
 ;(add-to-list 'sml/replacer-regexp-list '("^~/repos/dotfiles/" ":.files:") t)
 (setq sml/no-confirm-load-theme t)
 (sml/setup)
+
+(require 'fill-column-indicator)
+(add-hook 'python-mode-hook 'fci-mode)
+(add-hook 'babylon-mode-hook 'fci-mode)
 
 ; Enable auctex
 ;(load "auctex.el" nil t t)
@@ -273,6 +304,45 @@
 ; Enable some whespace settings
 (setq whitespace-style '(face trailing spaces-mark tab-mark))
 (global-whitespace-mode 1)
+
+(let* ((khan-linter-config-path (expand-file-name "~/khan/devtools/khan-linter/"))
+       (prettier-config-path (expand-file-name "~/.emacs.d/prettier-config/"))
+       (eslint-path (concat prettier-config-path "node_modules/.bin/eslint"))
+       (eslint-config-path (concat khan-linter-config-path "eslintrc.prettier")))
+  (setq prettier-args
+        `(
+          "--no-eslintrc"
+          "--config" ,eslint-config-path
+          "--fix-dry-run"
+          "--format" "json"
+          ))
+  (setq prettier-command eslint-path))
+
+(defun run-prettier ()
+  (interactive)
+  (let* ((outputbuf (get-buffer-create "*prettier json output*")))
+    (with-current-buffer outputbuf
+      (erase-buffer))
+    (apply 'call-process
+           prettier-command nil outputbuf nil
+           (append prettier-args (list buffer-file-name)))
+    (let* ((output-json
+            (with-current-buffer outputbuf
+              (goto-char (point-min))
+              (thing-at-point 'line t)))
+           (output-parsed (json-read-from-string output-json))
+           (data (aref output-parsed 0))
+           (output (alist-get 'output data))
+           (line (line-number-at-pos))
+           (column (current-column)))
+      (erase-buffer)
+      (insert output)
+      (goto-char (point-min))
+      (forward-line (- line 1))
+      (move-to-column column))))
+
+(global-set-key (kbd "C-x p") 'run-prettier)
+
 
 ; Setup less
 ;(autoload 'less-css-mode "less-css-mode" nil t)
@@ -324,17 +394,40 @@
 ;   :initial-value "black"))
 
 (custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(default ((t (:background "#080808" :foreground "#dadada"))))
  '(font-lock-builtin-face ((t (:foreground "yellow"))))
  '(font-lock-comment-face ((t (:foreground "#888"))))
  '(font-lock-constant-face ((t (:foreground "light slate blue"))))
- '(font-lock-negation-char-face ((t (:foreground "salmon"))))
  '(font-lock-function-name-face ((t (:foreground "chartreuse"))))
  '(font-lock-keyword-face ((t (:foreground "orange red"))))
+ '(font-lock-negation-char-face ((t (:foreground "salmon"))))
  '(font-lock-string-face ((t (:foreground "deep sky blue"))))
  '(font-lock-type-face ((t (:foreground "deep pink"))))
  '(font-lock-variable-name-face ((t (:foreground "lawn green"))))
- '(region ((t (:background "midnight blue"))))
  '(hl-line ((t (:background "#444"))))
-)
+ '(region ((t (:background "midnight blue")))))
 
+(defun kgrep (regexp)
+  (interactive
+   (list (grep-read-regexp)))
+  (vc-git-grep regexp "*" "~/khan/webapp"))
+
+(defun open-repo (org repo branch file line)
+  (call-process "chromium" nil nil nil (concat "https://github.com/" org "/" repo "/tree/" branch "/" file "#L" (number-to-string line))))
+
+(defun open-in-browser ()
+  (interactive)
+  (let ((file (buffer-file-name)))
+    (if (string-match "third_party/javascript-khansrc/\\([^/]+\\)/\\(.*\\)$" file)
+        (open-repo "khan" (match-string 1 file) "master" (match-string 2 file) (line-number-at-pos))
+      (if (string-match "khan/webapp/\\(.*\\)$" file)
+          (open-repo "khan" "webapp" "master" (match-string 1 file) (line-number-at-pos))
+        (message "Unknown repo")))))
+
+(defun upload-last-screenshot ()
+  (interactive)
+  (call-process "/home/xymostech/bin/upload_last_screenshot.sh" nil t nil))

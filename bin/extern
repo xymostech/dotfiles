@@ -2,11 +2,28 @@
 
 set -e
 
-if ! xrandr | grep -q "DP1 connected"
+COMMAND=$(basename $0)
+
+INTERNAL_INTERFACE=eDP1
+EXTERNAL_INTERFACE=DP1
+
+if ! xrandr | grep -q "^$EXTERNAL_INTERFACE connected"
 then
     echo "External display not connected"
     exit 1
 fi
 
-xrandr --output DP1 --auto
-xrandr --output eDP1 --off
+case "$COMMAND" in
+    intern)
+        xrandr --output "$INTERNAL_INTERFACE" --auto --pos 0x0
+        xrandr --output "$EXTERNAL_INTERFACE" --off
+        xrandr --dpi 96
+        i3-msg restart
+        ;;
+    extern)
+        xrandr --output "$EXTERNAL_INTERFACE" --auto
+        xrandr --output "$INTERNAL_INTERFACE" --off
+        xrandr --dpi 144
+        i3-msg restart
+        ;;
+esac
