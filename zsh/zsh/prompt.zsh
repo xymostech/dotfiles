@@ -24,12 +24,12 @@ short_pwd() {
 }
 
 function preexec() {
-    timer=$(date +%s%3N)
+    timer=$(gdate +%s%3N)
 }
 
 function precmd() {
     if [ $timer ]; then
-        timer_now=$(date +%s%3N)
+        timer_now=$(gdate +%s%3N)
         timer_diff=$(($timer_now - $timer))
 
         if test $timer_diff -lt 1000; then
@@ -38,8 +38,10 @@ function precmd() {
             command_time="$((timer_diff / 1000))s"
         elif test $timer_diff -lt 3600000; then
             command_time="$((timer_diff / 60000))m $(((timer_diff % 60000) / 1000))s"
-        else
+        elif test $timer_diff -lt 86400000; then
             command_time="$((timer_diff / 3600000))h $(((timer_diff % 3600000) / 60000))m"
+        else
+            command_time="$((timer_diff / 86400000))d $(((timer_diff % 86400000) / 3600000))h"
         fi
         unset timer
     else
