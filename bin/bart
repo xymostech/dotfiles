@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+source ~/.bart_api_key
+
+curl -s "https://api.bart.gov/api/bsa.aspx?cmd=bsa&key=$API_KEY&json=y" | \
+  jq --raw-output '.root.bsa[0].description."#cdata-section"'
+
+curl -s "https://api.bart.gov/api/etd.aspx?cmd=etd&orig=mont&key=$API_KEY&json=y" | \
+  jq --raw-output \
+    '[.root.station[0].etd[]
+      | select(.abbreviation=="RICH" or .abbreviation=="ANTC")
+      | {destination: .destination, estimate: .estimate[].minutes}
+      | select(.estimate!="Leaving")]
+    | sort_by(.estimate | tonumber)
+    | .[]
+    | (.estimate | tostring) + " minutes until " + .destination + " train"'

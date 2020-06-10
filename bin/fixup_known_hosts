@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -e
+
+HOST="$1"
+
+NEW_KEY=$(ssh-keyscan -t ecdsa "$HOST" 2>/dev/null)
+
+if ! grep -q "$NEW_KEY" ~/.ssh/known_hosts; then
+    echo "!!! $HOST IS NEW OR HOST KEY CHANGED FOR $HOST. AUTO-FIXING !!!";
+    ssh-keygen -q -R "$HOST" > /dev/null
+    echo "$NEW_KEY" >> ~/.ssh/known_hosts
+fi

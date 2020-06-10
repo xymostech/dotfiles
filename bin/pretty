@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+cd $(git rev-parse --show-toplevel)
+git status --porcelain --untracked-files=no | \
+  grep -v "^ \?D" | \
+  grep "\.js$" | \
+  cut -c4- | \
+  sed 's/.*-> \(.*\)/\1/' | \
+  xargs yarn eslint --fix
