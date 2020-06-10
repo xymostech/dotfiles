@@ -12,8 +12,8 @@ shift
 
 if tmux -q has-session -t "$session" 2>/dev/null; then
     tmux -2 attach-session -d -t "$session" "$@"
-elif tmuxifier ls | egrep -q "^$session\$"; then
-    tmuxifier s "$session" "$@"
+elif tmuxifier list-sessions | grep -q "$session"; then
+    tmuxifier load-session "$session" "$@"
 else
     tmux -2 new-session -s "$session" "$@"
 fi
