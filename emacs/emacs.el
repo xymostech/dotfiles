@@ -2,20 +2,22 @@
 ; Don't show a startup screen
 (setq inhibit-startup-screen +1)
 
-; Fish breaks some plugins
-(setq shell-file-name "/usr/bin/bash")
+; Use zsh
+(setq shell-file-name "/usr/local/bin/zsh")
 
 ; Never make annoying sounds
 (setq ring-bell-function 'ignore)
 
 ; Disable some UI features
 (menu-bar-mode -1)
-(tool-bar-mode -1)
 (scroll-bar-mode -1)
+; This needs to run after a few seconds to get the window to register with
+; contexts
+(run-at-time 6 nil (lambda () (tool-bar-mode -1)))
 
 ; Set some default tab settings
-(setq-default c-basic-offset 4      ; indent amount
-              tab-width 4           ; size of tabs
+(setq-default c-basic-offset 2      ; indent amount
+              tab-width 2           ; size of tabs
               indent-tabs-mode nil) ; don't use tab characters
 
 ; Use linux-style bracketing
@@ -32,11 +34,6 @@
 (setq auto-save-file-name-transforms
       '((".*" "~/.tmp" t)))
 
-; Save the place I last visited files
-;(require 'saveplace)
-;(setq-default save-place t)
-;(setq save-place-file "~/.emacs.d/save-places")
-
 ; Turn off the blinking cursor
 (setq blink-cursor-mode nil)
 
@@ -46,10 +43,6 @@
 ; Set the default line wrap
 (setq-default fill-column 79)
 
-; Use the x clipboard
-;(setq x-select-enable-primary nil)
-;(setq x-select-enable-clipboard t)
-
 ; Make the mark ring better
 (setq set-mark-command-repeat-pop t)
 (setq mark-ring-max 100)
@@ -57,163 +50,55 @@
 ; End sentences with a single space
 (setq sentence-end-double-space nil)
 
-; Make scrolling never jump, ever
-;(setq scroll-margin 3)
-;(setq scroll-conservatively 10000)
-;(setq scroll-up-aggressively 0.01)
-;(setq scroll-down-aggressively 0.01)
-;(setq scroll-step 1)
-;(setq scroll-preserve-screen-position 1)
-;(setq redisplay-dont-pause t)
-
-; Make unique filenames more useful
-;(require 'uniquify)
-;(setq uniquify-buffer-name-style 'reverse)
-;(setq uniquify-after-kill-buffer-p t)
-;(setq uniquify-ignore-buffers-re "^\\*")
-
-; Setup ido
-;(require 'ido)
-;(ido-mode t)
-;(ido-everywhere t)
-;(setq ido-enable-flex-matching t)
-;(setq ido-use-filename-at-point nil)
-;(setq ido-create-new-buffer 'always)
-
-; Always indent after return. I would try using C-j, but it conflicts with tmux
-;(define-key global-map (kbd "RET") 'newline-and-indent)
-
 ; Turn on column numbering
 (setq column-number-mode t)
 
-; ------- Package setup --------
+; Always vertical split
+(setq split-height-threshold 99999)
+
+; Allow emojis to be displayed
+(set-fontset-font t 'unicode "Noto Emoji" nil 'prepend)
+
+; Remove electric indent by default
+(electric-indent-mode -1)
+
+; ------- Package.el setup --------
+
 ; Setup the list of package sources
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.org/packages/")))
-
-;; Marmalade doesn't seem to work: https://github.com/nicferrier/elmarmalade/issues/55
-;; ("marmalade" . "https://marmalade-repo.org/packages/")
-
-; The list of packages I install through package.el
-(defvar managed-packages
-  '(magit
-    haskell-mode
-    ;;js2-mode
-    less-css-mode
-    color-theme
-    ;;rust-mode
-    smart-mode-line
-    ;;lua-mode
-    markdown-mode
-    projectile
-    helm-projectile
-    ;;prettier-js
-    ;;glsl-mode
-    ))
-
-; The list of packages I manually manage
-(defvar manual-packages
-  '(web-mode
-    editor-config
-    json-mode
-    helm
-    ))
 
 ; Setup package.el
 (require 'package)
 (package-initialize)
 
-; Ensure all of the packages are loaded
-(package-refresh-contents)
-(dolist (package managed-packages)
-  (when (not (package-installed-p package))
-    (package-install package)))
-
-; Add manual plugin paths (this automatically adds everything in ~/.emacs.d/manual/)
-(setq load-path
-      (append
-       (delq nil
-             (mapcar (lambda (file)
-                       (and (file-directory-p (concat "~/.emacs.d/manual/" file))
-                            (not (equal file "."))
-                            (not (equal file ".."))
-                            (expand-file-name (concat "~/.emacs.d/manual/" file))))
-                     (directory-files (expand-file-name "~/.emacs.d/manual/"))))
-       load-path))
-
-(add-to-list 'load-path "~/projects/babylon-mode/")
+; Setup use-package
+(package-install 'use-package)
+(eval-when-compile
+  (require 'use-package))
 
 ; ------- Filetype Specific Settings -------
 
-(mapcar
- (lambda (data)
-          (autoload (car data) (cdr data) nil t))
- '(
-   (markdown-mode . "markdown-mode")
-   (js2-mode . "js2-mode")
-   (web-mode . "web-mode")
-   ; (rjsx-mode . "rjsx-mode")
-   (json-mode . "json-mode")
-   (rust-mode . "rust-mode")
-   (babylon-mode . "babylon-mode")
-   (lyqi-mode . "lyqi")
-   ; (typescript-mode . "typescript")
-   ))
+(use-package saveplace
+  :config
+  (save-place-mode 1)
+  (setq save-place-file "~/.emacs.d/save-places"))
 
-(setq auto-mode-alist
-      (append '(
-                ("\\.jsx\\'" . babylon-mode)
-                ("\\.js\\'" . babylon-mode)
-                ("\\.json$" . json-mode)
-                ("\\.rs$" . rust-mode)
-                ("\\.ly$" . lyqi-mode)
-                ; ("\\.ts$" . typescript-mode)
-               )
-              auto-mode-alist))
+(use-package babylon-mode
+  :load-path "~/repos/babylon-mode/"
+  :mode "\\.js\\'"
+  :mode "\\.jsx\\'"
+  :init
+  (setq js-indent-level 2)
+  (add-to-list 'exec-path "/Users/emilyeisenberg/.nvm/versions/node/v12.18.0/bin"))
 
-(add-hook 'json-mode-hook
-          (lambda ()
-            (make-local-variable 'js-indent-level)
-            (setq js-indent-level 2)))
-
-; change some indenting settings in C++
-;(add-hook 'c++mode-hook
-;          (lambda ()
-;            (setq c-basic-offset 8)
-;            (setq tab-width 8)
-;            (setq indent-tabs-mode t)))
-
-; Add mail-mode for mutt
-;(add-to-list 'auto-mode-alist '("/tmp/mutt.*" . mail-mode))
-
-;(autoload 'elm-mode "elm-mode" nil t)
-;(add-to-list 'auto-mode-alist '("\\.elm\\'" . elm-mode))
-
-;(setenv "PATH" (concat (getenv "PATH") ":~/.elm/bin"))
-;(add-to-list 'exec-path "~/.elm/bin")
-
-;(autoload 'markdown-mode "markdown-mode" nil t)
-;(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-
-(add-hook 'haskell-mode-hook 'haskell-indent-mode)
-
-;(require 'lua-mode)
-;(setq lua-indent-level 2)
-
-;(autoload 'glsl-mode "glsl-mode" nil t)
-;(add-to-list 'auto-mode-alist '("\\.glsl\\'" . glsl-mode))
-
-; ------- Plugin Specifc Settings --------
-
-; Setup linum (cause nlinum causes segfaults!?)
-(require 'linum)
-; Use our own formatting function to get the number with a single
-; space after it.
-(defun linum-format-func (line)
-  (let ((w (length (number-to-string (count-lines (point-min) (point-max))))))
-    (propertize (format (format "%%%dd " w) line) 'face 'linum)))
-(setq linum-format 'linum-format-func)
-(global-linum-mode 1)
+(use-package linum
+  :config
+  (defun linum-format-func (line)
+    (let ((w (length (number-to-string (count-lines (point-min) (point-max))))))
+      (propertize (format (format "%%%dd" w) line) 'face 'linum)))
+  (setq linum-format 'linum-format-func)
+  (global-linum-mode 1))
 
 (defun helm-maybe-projectile-find-files (arg)
   (interactive "P")
@@ -221,177 +106,92 @@
       (helm-projectile-find-file arg)
     (helm-find-files arg)))
 
-(require 'helm-config)
-(helm-mode 1)
-(global-set-key (kbd "C-x C-f") 'helm-maybe-projectile-find-files)
-(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to do persistent action
-(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
-(define-key helm-map (kbd "C-z") 'helm-select-action) ; list actions using C-z
+(use-package helm
+  :ensure t
+  :demand
+  :preface (require 'helm-config)
+  :bind (("C-x C-f" . helm-maybe-projectile-find-files)
+         :map helm-map
+         ("<tab>" . helm-execute-persistent-action))
+  :config
+  (helm-mode 1))
 
-(projectile-global-mode)
-(setq projectile-enable-caching t)
-(require 'helm-projectile)
-(helm-projectile-on)
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-global-mode))
 
-(setq js2-strict-trailing-comma-warning nil)
-(setq js2-mode-show-parse-errors nil)
-(setq js2-mode-show-strict-warnings nil)
+(use-package helm-projectile
+  :ensure t
+  :init
+  (setq projectile-enable-caching t)
+  :config
+  (helm-projectile-on)
 
-(require 'flycheck-flow)
-(add-hook 'js2-mode-hook 'flycheck-mode)
-; (add-hook 'rjsx-mode-hook 'flycheck-mode)
-(flycheck-add-next-checker 'javascript-flow 'javascript-eslint)
-(setq flycheck-idle-change-delay 1.0)
-(setq flycheck-javascript-eslint-executable "/home/xymostech/bin/flycheckeslint")
+  (defun projectile-files-via-ext-command (root command)
+    "Get a list of relative file names in the project ROOT by executing COMMAND.
+     If `command' is nil or an empty string, return nil.
+     This allows commands to be disabled."
+    (when (stringp command)
+      (let ((default-directory root)
+            (buffer (get-buffer-create (generate-new-buffer-name " *git-output*")))
+            (result nil))
+        (call-process "git" nil buffer nil "ls-files" "-zco" "--exclude-standard")
+        (setq result (split-string (with-current-buffer buffer (buffer-string)) "\0" t))
+        (kill-buffer buffer)
+        result)))
 
-(add-to-list 'compilation-error-regexp-alist 'flow)
-(setf (alist-get 'flow compilation-error-regexp-alist)
-      '("^\\(.*?[^/\n]\\):[ \t]*\\([1-9][0-9]*\\)[ \t]*$"
-        1 2))
+  (defun projectile-dir-files-alien (directory)
+    "Get the files for DIRECTORY using external tools."
+    (let ((vcs (projectile-project-vcs directory)))
+      (projectile-files-via-ext-command directory (projectile-get-ext-command vcs))))
+  )
 
-;(autoload 'rust-mode "rust-mode" nil t)
-;(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
-
-;(autoload 'web-mode "web-mode" nil t)
-;(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
-;(add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
-
-(setq web-mode-content-types-alist
-  '(("jsx" . "\\.js[x]?\\'")))
-(setq web-mode-enable-auto-quoting nil)
-
-;(defadvice web-mode-highlight-part (around tweak-jsx activate)
-;    (if (equal web-mode-content-type "jsx")
-;              (let ((web-mode-enable-part-face nil))
-;                        ad-do-it)
-;          ad-do-it))
-
-;(add-hook 'web-mode-hook
-;          (lambda ()
-;            (setq web-mode-css-indent-offset 4)
-;            (setq web-mode-code-indent-offset 4)
-;            (setq web-mode-style-padding 2)
-;            (setq web-mode-script-padding 2)))
-
-; Setup smart-mode-line
-(require 'smart-mode-line)
-(setq
- sml/replacer-regexp-list
- '(
-   ("^~/repos/dotfiles/" ":dotfiles:/")
-   ("^~/khan/webapp/third_party/javascript-khansrc/perseus" ":perseus:/")
-   ("^~/khan/webapp/" ":webapp:/")
-   ("^~/projects/" ":projects:/")
+(use-package smart-mode-line
+  :ensure t
+  :init
+  (setq mode-line-format
+        '("%e"
+          mode-line-front-space
+          mode-line-mule-info
+          mode-line-client
+          mode-line-modified
+          mode-line-remote
+          mode-line-frame-identification
+          mode-line-buffer-identification
+          "   "
+          mode-line-modes
+          mode-line-misc-info
+          mode-line-end-spaces))
+  :config
+  (setq
+   sml/replacer-regexp-list
+   '(
+     ("^~/repos/dotfiles/" ":dotfiles:/")
+     ("^~/source/dream/www/" ":dream:/")
+     ("^~/source/admin/www/" ":admin:/")
+     ("^~/source/pro/www/" ":pro:/")
+     ("^~/source/vault/www/" ":vault:/")
+     ("^~/source/lib/www/" ":lib:/")
+     ("^~/source/" ":source:/")
+     )
    )
- )
-(setq sml/theme 'dark)
-;(add-to-list 'sml/replacer-regexp-list '("^~/repos/dotfiles/" ":.files:") t)
-(setq sml/no-confirm-load-theme t)
-(sml/setup)
+  (setq sml/theme 'dark)
+  (setq sml/no-confirm-load-theme t)
+  (setq sml/name-width 999)
+  (setq sml/mode-width 'full)
+  (sml/setup))
 
-(require 'fill-column-indicator)
-(add-hook 'python-mode-hook 'fci-mode)
-(add-hook 'babylon-mode-hook 'fci-mode)
+(use-package whitespace-mode
+  :no-require t
+  :config
+  (setq whitespace-style '(face trailing spaces-mark tab-mark))
+  (global-whitespace-mode 1))
 
-; Enable auctex
-;(load "auctex.el" nil t t)
+(use-package magit
+  :ensure t)
 
-; Don't break on inline math
-;(add-hook 'LaTeX-mode-hook
-;          (lambda ()
-;            (add-to-list 'fill-nobreak-predicate 'texmathp)))
-
-; Enable some whespace settings
-(setq whitespace-style '(face trailing spaces-mark tab-mark))
-(global-whitespace-mode 1)
-
-(let* ((khan-linter-config-path (expand-file-name "~/khan/devtools/khan-linter/"))
-       (prettier-config-path (expand-file-name "~/.emacs.d/prettier-config/"))
-       (eslint-path (concat prettier-config-path "node_modules/.bin/eslint"))
-       (eslint-config-path (concat khan-linter-config-path "eslintrc.prettier")))
-  (setq prettier-args
-        `(
-          "--no-eslintrc"
-          "--config" ,eslint-config-path
-          "--fix-dry-run"
-          "--format" "json"
-          ))
-  (setq prettier-command eslint-path))
-
-(defun run-prettier ()
-  (interactive)
-  (let* ((outputbuf (get-buffer-create "*prettier json output*")))
-    (with-current-buffer outputbuf
-      (erase-buffer))
-    (apply 'call-process
-           prettier-command nil outputbuf nil
-           (append prettier-args (list buffer-file-name)))
-    (let* ((output-json
-            (with-current-buffer outputbuf
-              (goto-char (point-min))
-              (thing-at-point 'line t)))
-           (output-parsed (json-read-from-string output-json))
-           (data (aref output-parsed 0))
-           (output (alist-get 'output data))
-           (line (line-number-at-pos))
-           (column (current-column)))
-      (erase-buffer)
-      (insert output)
-      (goto-char (point-min))
-      (forward-line (- line 1))
-      (move-to-column column))))
-
-(global-set-key (kbd "C-x p") 'run-prettier)
-
-
-; Setup less
-;(autoload 'less-css-mode "less-css-mode" nil t)
-;(add-to-list 'auto-mode-alist '("\\.less\\'" . less-css-mode))
-
-; Setup editor config
-;(load "editorconfig")
-
-; Set up magit
-;(require 'magit)
-
-; -------- Random Extra Functions -------
-
-; Paste from the x clipboard
-(defun x-paste ()
-  (interactive)
-  (call-process "xclip" nil t nil "-o" "-selection" "clipboard"))
-
-; Copy to the x clipboard
-(defun x-copy ()
-  (interactive)
-  (call-process-region (region-beginning) (region-end)
-                       "xclip" nil 0 nil "-i" "-selection" "clipboard")
-  (deactivate-mark))
-
-; Fix the javascript regexp regexp for js-mode
-;(add-hook 'js-mode-hook
-;  (lambda ()
-;    (defun js-syntax-propertize-regexp (end)
-;      (when (eq (nth 3 (syntax-ppss)) ?/)
-;        ;; A /.../ regexp.
-;        (when (re-search-forward "\\(\\/\\|\\\[[^]]*?\\\]\\|[^/[]\\)*?\\(\\/\\|\\\[[^]]*\\]\\|[^\\/]\\)/" end 'move)
-;          (put-text-property (1- (point)) (point)
-;                             'syntax-table (string-to-syntax "\"/")))))))
-
-; Calculate the closest defined (i.e. builtin) color to a given
-; color. This is done automatically by emacs when given a color that
-; isn't supported, so isn't necessary, but is interesting to see
-; cl-lib in action.
-
-;(require 'cl-lib)
-;(defun closest-defined-color (color)
-;  (cl-reduce
-;   (lambda (prev-best test)
-;     (if (< (color-distance color test) (color-distance color prev-best))
-;         test
-;       prev-best))
-;   (defined-colors)
-;   :initial-value "black"))
+; -------- My custom color scheme ---------
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -411,23 +211,57 @@
  '(hl-line ((t (:background "#444"))))
  '(region ((t (:background "midnight blue")))))
 
-(defun kgrep (regexp)
+; -------- Random Extra Functions -------
+
+(setq search-dir "~")
+
+(defun sgrep (regexp)
   (interactive
    (list (grep-read-regexp)))
-  (vc-git-grep regexp "*" "~/khan/webapp"))
+  (let ((default-directory search-dir)
+        (compilation-environment (cons "PAGER=" compilation-environment))
+        (command (grep-expand-template "/usr/local/bin/rg --vimgrep <R>" regexp)))
+    (compilation-start command 'grep-mode)))
+(global-set-key (kbd "s-f") 'sgrep)
 
-(defun open-repo (org repo branch file line)
-  (call-process "chromium" nil nil nil (concat "https://github.com/" org "/" repo "/tree/" branch "/" file "#L" (number-to-string line))))
-
-(defun open-in-browser ()
+(defun save-open-buffers ()
   (interactive)
-  (let ((file (buffer-file-name)))
-    (if (string-match "third_party/javascript-khansrc/\\([^/]+\\)/\\(.*\\)$" file)
-        (open-repo "khan" (match-string 1 file) "master" (match-string 2 file) (line-number-at-pos))
-      (if (string-match "khan/webapp/\\(.*\\)$" file)
-          (open-repo "khan" "webapp" "master" (match-string 1 file) (line-number-at-pos))
-        (message "Unknown repo")))))
+  (write-region
+   (pp (seq-filter (lambda (x) (if x t nil)) (mapcar 'buffer-file-name (buffer-list))))
+   nil
+   "~/buffers.txt"))
 
-(defun upload-last-screenshot ()
+(defun load-open-buffers ()
   (interactive)
-  (call-process "/home/xymostech/bin/upload_last_screenshot.sh" nil t nil))
+  (let ((buffers
+         (with-temp-buffer
+           (insert-file-contents "~/buffers.txt")
+           (read (current-buffer)))))
+    (mapc 'find-file-noselect buffers)))
+
+(defun ask-before-closing ()
+  "Close only if y was pressed."
+  (interactive)
+  (if (y-or-n-p (format "Are you sure you want to close this frame? "))
+      (save-buffers-kill-emacs)
+    (message "Canceled frame close")))
+
+(global-set-key (kbd "C-x C-c") 'ask-before-closing)
+
+(defun kill-line-no-kill-ring ()
+  "Like kill-line but without adding to the kill ring"
+  (interactive)
+  (delete-region (point) (line-end-position)))
+(global-set-key (kbd "C-M-k") 'kill-line-no-kill-ring)
+
+; -------- machine-specific-settings -------
+
+(load "~/.emacs.d/machine.el")
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (use-package smart-mode-line markdown-mode magit helm-projectile haskell-mode flycheck fill-column-indicator f color-theme))))

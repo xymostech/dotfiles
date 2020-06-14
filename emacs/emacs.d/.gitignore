@@ -1,3 +1,6 @@
 elpa
 *.log
 save-places
+auto-save-list
+projectile-bookmarks.eld
+projectile.cache
