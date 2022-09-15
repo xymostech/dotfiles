@@ -5,3 +5,4 @@ vendor/
 *~
 *#
 .emacs.desktop*
+.DS_Store

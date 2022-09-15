@@ -3,6 +3,7 @@ PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/sbin:/bin:/usr/sbin
 PATH=$HOME/bin:$PATH
 PATH=/usr/local/mysql/bin:$PATH
 PATH=$PATH:$HOME/.tmuxifier/bin
+PATH=$PATH:/opt/homebrew/bin
 export PATH=$PATH
 
 # Setup git auto-completion
@@ -13,7 +14,8 @@ autoload -Uz compinit && compinit
 
 # Setup nvm
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+NVM_INSTALL_DIR="/opt/homebrew/Cellar/nvm/0.39.0"
+[ -s "$NVM_INSTALL_DIR/nvm.sh" ] && \. "$NVM_INSTALL_DIR/nvm.sh"
 
 # Add my PROMPT
 source ~/.zsh/prompt.zsh

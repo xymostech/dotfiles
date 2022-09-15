@@ -3,7 +3,7 @@
 (setq inhibit-startup-screen +1)
 
 ; Use zsh
-(setq shell-file-name "/usr/local/bin/zsh")
+(setq shell-file-name "/opt/homebrew/bin/zsh")
 
 ; Never make annoying sounds
 (setq ring-bell-function 'ignore)
@@ -62,6 +62,15 @@
 ; Remove electric indent by default
 (electric-indent-mode -1)
 
+; Don't use lockfiles, since we're the only one editing these files
+(setq create-lockfiles nil)
+
+; Show line numbers everywhere
+(global-display-line-numbers-mode)
+
+; Don't ask about saving buffers before grepping
+(setq grep-save-buffers nil)
+
 ; ------- Package.el setup --------
 
 ; Setup the list of package sources
@@ -79,6 +88,13 @@
 
 ; ------- Filetype Specific Settings -------
 
+; Disable C-z (minimize) in graphical mode
+; Note: this must come after package-initialize
+(if (display-graphic-p)
+    (progn
+      (require 'bind-key)
+      (unbind-key (kbd "C-z"))))
+
 (use-package saveplace
   :config
   (save-place-mode 1)
@@ -90,15 +106,14 @@
   :mode "\\.jsx\\'"
   :init
   (setq js-indent-level 2)
-  (add-to-list 'exec-path "/Users/emilyeisenberg/.nvm/versions/node/v12.18.0/bin"))
+  (add-to-list 'exec-path "/Users/emilyeisenberg/.nvm/versions/node/v12.22.7/bin"))
 
-(use-package linum
-  :config
-  (defun linum-format-func (line)
-    (let ((w (length (number-to-string (count-lines (point-min) (point-max))))))
-      (propertize (format (format "%%%dd" w) line) 'face 'linum)))
-  (setq linum-format 'linum-format-func)
-  (global-linum-mode 1))
+(use-package tide
+  :ensure t
+  :after (typescript-mode company flycheck)
+  :hook ((typescript-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)
+         (before-save . tide-format-before-save)))
 
 (defun helm-maybe-projectile-find-files (arg)
   (interactive "P")
@@ -191,6 +206,9 @@
 (use-package magit
   :ensure t)
 
+(use-package multiple-cursors
+  :bind (("M-SPC" . set-rectangular-region-anchor)))
+
 ; -------- My custom color scheme ---------
 
 (custom-set-faces
@@ -220,7 +238,7 @@
    (list (grep-read-regexp)))
   (let ((default-directory search-dir)
         (compilation-environment (cons "PAGER=" compilation-environment))
-        (command (grep-expand-template "/usr/local/bin/rg --vimgrep <R>" regexp)))
+        (command (grep-expand-template "/opt/homebrew/bin/rg --vimgrep <R>" regexp)))
     (compilation-start command 'grep-mode)))
 (global-set-key (kbd "s-f") 'sgrep)
 
